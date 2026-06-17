@@ -1,0 +1,29 @@
+{
+  "name": "etalase-module",
+  "version": "1.0.0",
+  "description": "SDK for connecting custom webpages to the eTalase storefront API",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": ["etalase", "jastip", "sdk", "storefront"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
+  }
+}
