@@ -12,7 +12,7 @@ function effectivePrice(item: CartItem): number {
 }
 
 export interface CartManagerOptions {
-  storeId: string;
+  storeKey: string;
   persist?: boolean;
 }
 
@@ -23,7 +23,7 @@ export class CartManager {
   private readonly _persist: boolean;
 
   constructor(options: CartManagerOptions) {
-    this._storageKey = `etalase-cart-${options.storeId}`;
+    this._storageKey = `etalase-cart-${options.storeKey}`;
     this._persist = options.persist ?? false;
     if (this._persist) this._hydrate();
   }
