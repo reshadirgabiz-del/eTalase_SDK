@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="description" content="eTalase SDK — a framework-agnostic TypeScript client for the eTalase storefront API. Products, cart, checkout, delivery, promo codes, and order tracking." />
+  <title>eTalase SDK · Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* =========================================================
+       Mantine-inspired design tokens
+       ========================================================= */
+    :root {
+      --mantine-color-body: #1a1b1e;
+      --mantine-color-bg: #141517;
+      --mantine-color-surface: #25262b;
+      --mantine-color-surface-2: #2c2e33;
+      --mantine-color-border: #2c2e33;
+      --mantine-color-border-strong: #373a40;
+      --mantine-color-text: #c1c2c5;
+      --mantine-color-text-strong: #f1f3f5;
+      --mantine-color-dimmed: #909296;
+      --mantine-color-subtle: #5c5f66;
+
+      --mantine-color-blue: #4dabf7;
+      --mantine-color-blue-strong: #74c0fc;
+      --mantine-color-blue-bg: rgba(77, 171, 247, 0.12);
+      --mantine-color-teal: #38d9a9;
+      --mantine-color-yellow: #ffd43b;
+      --mantine-color-yellow-bg: rgba(255, 212, 59, 0.10);
+      --mantine-color-red: #ff6b6b;
+      --mantine-color-red-bg: rgba(255, 107, 107, 0.10);
+      --mantine-color-violet: #b197fc;
+
+      --mantine-radius-sm: 4px;
+      --mantine-radius-md: 8px;
+      --mantine-radius-lg: 12px;
+
+      --mantine-shadow-md: 0 1px 3px rgba(0,0,0,0.5), 0 10px 15px -5px rgba(0,0,0,0.4);
+
+      --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+      --header-h: 60px;
+      --sidebar-w: 280px;
+      --toc-w: 240px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --mantine-color-body: #ffffff;
+        --mantine-color-bg: #f8f9fa;
+        --mantine-color-surface: #ffffff;
+        --mantine-color-surface-2: #f1f3f5;
+        --mantine-color-border: #e9ecef;
+        --mantine-color-border-strong: #dee2e6;
+        --mantine-color-text: #495057;
+        --mantine-color-text-strong: #212529;
+        --mantine-color-dimmed: #868e96;
+        --mantine-color-subtle: #adb5bd;
+        --mantine-color-blue: #228be6;
+        --mantine-color-blue-strong: #1c7ed6;
+        --mantine-color-blue-bg: rgba(34, 139, 230, 0.08);
+        --mantine-color-yellow-bg: rgba(250, 176, 5, 0.12);
+        --mantine-color-red-bg: rgba(250, 82, 82, 0.10);
+      }
+    }
+
+    /* =========================================================
+       Reset & base
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--mantine-color-body);
+      color: var(--mantine-color-text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    ::selection { background: var(--mantine-color-blue-bg); color: var(--mantine-color-text-strong); }
+    a { color: var(--mantine-color-blue); text-decoration: none; }
+    a:hover { color: var(--mantine-color-blue-strong); text-decoration: underline; text-underline-offset: 2px; }
+    img { max-width: 100%; display: block; }
+
+    /* =========================================================
+       Header
+       ========================================================= */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--header-h);
+      background: color-mix(in srgb, var(--mantine-color-body) 92%, transparent);
+      backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      border-bottom: 1px solid var(--mantine-color-border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 14px;
+    }
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--mantine-color-text-strong);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .brand-link:hover { text-decoration: none; }
+    .brand-mark {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      display: grid; place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, #4dabf7, #b197fc);
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(77, 171, 247, 0.35);
+    }
+    .brand-version {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--mantine-color-dimmed);
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--mantine-color-border-strong);
+      background: var(--mantine-color-surface);
+    }
+    .header-spacer { flex: 1; }
+    .header-search {
+      flex: 0 1 360px;
+      position: relative;
+    }
+    .header-search input {
+      width: 100%;
+      padding: 7px 12px 7px 34px;
+      background: var(--mantine-color-surface);
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: var(--mantine-radius-md);
+      color: var(--mantine-color-text);
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .header-search input::placeholder { color: var(--mantine-color-dimmed); }
+    .header-search input:focus { border-color: var(--mantine-color-blue); }
+    .header-search svg {
+      position: absolute;
+      left: 10px; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      color: var(--mantine-color-dimmed);
+    }
+    .header-kbd {
+      position: absolute;
+      right: 8px; top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 1px 6px;
+      color: var(--mantine-color-dimmed);
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: 4px;
+      background: var(--mantine-color-body);
+    }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .icon-btn {
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border-radius: var(--mantine-radius-md);
+      color: var(--mantine-color-dimmed);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .icon-btn:hover {
+      background: var(--mantine-color-surface);
+      color: var(--mantine-color-text-strong);
+      border-color: var(--mantine-color-border);
+    }
+    .icon-btn svg { width: 18px; height: 18px; }
+    .nav-toggle { display: none; }
+
+    /* =========================================================
+       Layout
+       ========================================================= */
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--toc-w);
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: sticky;
+      top: var(--header-h);
+      height: calc(100vh - var(--header-h));
+      overflow-y: auto;
+      padding: 26px 12px 40px 20px;
+      border-right: 1px solid var(--mantine-color-border);
+    }
+    .nav-group { margin-bottom: 22px; }
+    .nav-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--mantine-color-dimmed);
+      padding: 4px 12px;
+      margin-bottom: 4px;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px;
+      border-radius: var(--mantine-radius-sm);
+      font-size: 13.5px;
+      color: var(--mantine-color-text);
+      transition: background-color 0.12s ease, color 0.12s ease;
+      border-left: 2px solid transparent;
+      margin-left: -2px;
+    }
+    .nav-link:hover {
+      background: var(--mantine-color-surface);
+      color: var(--mantine-color-text-strong);
+      text-decoration: none;
+    }
+    .nav-link.is-active {
+      color: var(--mantine-color-blue-strong);
+      background: var(--mantine-color-blue-bg);
+      border-left-color: var(--mantine-color-blue);
+      font-weight: 500;
+    }
+    .nav-link .nav-icon { width: 14px; height: 14px; opacity: 0.75; flex-shrink: 0; }
+
+    /* Main content */
+    .content {
+      padding: 48px 56px 96px;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .content > section { scroll-margin-top: calc(var(--header-h) + 16px); }
+
+    /* TOC */
+    .toc {
+      position: sticky;
+      top: var(--header-h);
+      height: calc(100vh - var(--header-h));
+      overflow-y: auto;
+      padding: 32px 20px 40px;
+      border-left: 1px solid var(--mantine-color-border);
+    }
+    .toc-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--mantine-color-dimmed);
+      margin-bottom: 12px;
+    }
+    .toc-list { list-style: none; padding: 0; margin: 0; }
+    .toc-list a {
+      display: block;
+      padding: 4px 10px;
+      font-size: 13px;
+      color: var(--mantine-color-dimmed);
+      border-left: 2px solid transparent;
+      transition: color 0.12s ease, border-color 0.12s ease;
+    }
+    .toc-list a:hover { color: var(--mantine-color-text-strong); text-decoration: none; }
+    .toc-list a.is-active {
+      color: var(--mantine-color-blue-strong);
+      border-left-color: var(--mantine-color-blue);
+    }
+    .toc-list a.indent-2 { padding-left: 22px; font-size: 12.5px; }
+
+    /* =========================================================
+       Typography
+       ========================================================= */
+    .eyebrow {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--mantine-color-blue);
+      background: var(--mantine-color-blue-bg);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      font-weight: 500;
+    }
+    h1, h2, h3, h4 {
+      color: var(--mantine-color-text-strong);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      scroll-margin-top: calc(var(--header-h) + 16px);
+    }
+    h1 { font-size: 42px; margin: 0 0 16px; }
+    h2 {
+      font-size: 28px;
+      margin: 64px 0 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--mantine-color-border);
+    }
+    h3 { font-size: 19px; margin: 36px 0 12px; }
+    h4 { font-size: 15px; margin: 22px 0 8px; color: var(--mantine-color-text-strong); }
+    p { margin: 0 0 14px; }
+    .lead { font-size: 18px; line-height: 1.55; color: var(--mantine-color-text); margin: 0 0 28px; }
+    ul, ol { padding-left: 22px; margin: 0 0 16px; }
+    li { margin: 4px 0; }
+    li::marker { color: var(--mantine-color-dimmed); }
+    hr { border: 0; border-top: 1px solid var(--mantine-color-border); margin: 32px 0; }
+    strong { color: var(--mantine-color-text-strong); font-weight: 600; }
+
+    /* =========================================================
+       Inline code & code blocks
+       ========================================================= */
+    :not(pre) > code {
+      font-family: var(--font-mono);
+      font-size: 0.87em;
+      padding: 2px 6px;
+      background: var(--mantine-color-surface);
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: var(--mantine-radius-sm);
+      color: var(--mantine-color-blue-strong);
+    }
+    .code-block {
+      position: relative;
+      margin: 18px 0 24px;
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: var(--mantine-radius-md);
+      background: #0e0f12;
+      overflow: hidden;
+    }
+    .code-block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px 8px 16px;
+      background: var(--mantine-color-surface);
+      border-bottom: 1px solid var(--mantine-color-border-strong);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--mantine-color-dimmed);
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
+    }
+    .code-block pre {
+      margin: 0;
+      padding: 16px 18px;
+      overflow-x: auto;
+      background: transparent;
+    }
+    .code-block pre code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.65;
+      color: #e6e8eb;
+      background: transparent;
+      border: 0;
+      padding: 0;
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      color: var(--mantine-color-dimmed);
+      background: transparent;
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: var(--mantine-radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .copy-btn:hover { color: var(--mantine-color-text-strong); border-color: var(--mantine-color-blue); }
+    .copy-btn svg { width: 12px; height: 12px; }
+    .copy-btn.is-copied { color: var(--mantine-color-teal); border-color: var(--mantine-color-teal); }
+
+    /* Token coloring (lightweight syntax highlighting) */
+    .tok-kw  { color: #b197fc; }
+    .tok-str { color: #8ce99a; }
+    .tok-num { color: #ffc078; }
+    .tok-com { color: #5c5f66; font-style: italic; }
+    .tok-fn  { color: #74c0fc; }
+    .tok-ty  { color: #ffd43b; }
+    .tok-pun { color: #909296; }
+
+    /* =========================================================
+       Tables
+       ========================================================= */
+    .table-wrap {
+      margin: 16px 0 28px;
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: var(--mantine-radius-md);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th, td {
+      text-align: left;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--mantine-color-border);
+      vertical-align: top;
+    }
+    thead th {
+      background: var(--mantine-color-surface);
+      color: var(--mantine-color-dimmed);
+      font-weight: 600;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: rgba(255,255,255,0.015); }
+
+    /* =========================================================
+       Hero & feature cards
+       ========================================================= */
+    .hero {
+      padding: 28px 0 44px;
+      border-bottom: 1px solid var(--mantine-color-border);
+      margin-bottom: 14px;
+    }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--mantine-color-text);
+      background: var(--mantine-color-surface);
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: 999px;
+    }
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mantine-color-teal); }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 22px 0 28px;
+    }
+    .feature {
+      padding: 18px;
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: var(--mantine-radius-md);
+      background: var(--mantine-color-surface);
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .feature:hover { border-color: var(--mantine-color-blue); transform: translateY(-1px); }
+    .feature-icon {
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border-radius: var(--mantine-radius-sm);
+      background: var(--mantine-color-blue-bg);
+      color: var(--mantine-color-blue);
+      margin-bottom: 12px;
+    }
+    .feature-icon svg { width: 18px; height: 18px; }
+    .feature h4 { margin: 0 0 4px; font-size: 14.5px; }
+    .feature p { margin: 0; font-size: 13px; color: var(--mantine-color-dimmed); }
+
+    /* =========================================================
+       Callouts
+       ========================================================= */
+    .callout {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      margin: 18px 0 22px;
+      border-radius: var(--mantine-radius-md);
+      border: 1px solid var(--mantine-color-border-strong);
+      background: var(--mantine-color-surface);
+      font-size: 14px;
+    }
+    .callout-icon {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      margin-top: 2px;
+      color: var(--mantine-color-blue);
+    }
+    .callout-body { flex: 1; min-width: 0; }
+    .callout-body > *:first-child { margin-top: 0; }
+    .callout-body > *:last-child { margin-bottom: 0; }
+    .callout-title { font-weight: 600; color: var(--mantine-color-text-strong); margin-bottom: 4px; }
+    .callout.info    { border-left: 3px solid var(--mantine-color-blue);   background: var(--mantine-color-blue-bg); }
+    .callout.warn    { border-left: 3px solid var(--mantine-color-yellow); background: var(--mantine-color-yellow-bg); }
+    .callout.warn   .callout-icon { color: var(--mantine-color-yellow); }
+    .callout.danger  { border-left: 3px solid var(--mantine-color-red);    background: var(--mantine-color-red-bg); }
+    .callout.danger .callout-icon { color: var(--mantine-color-red); }
+    .callout.success { border-left: 3px solid var(--mantine-color-teal); }
+    .callout.success .callout-icon { color: var(--mantine-color-teal); }
+
+    /* =========================================================
+       Tabs (install)
+       ========================================================= */
+    .tabs { margin: 18px 0 24px; }
+    .tablist {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid var(--mantine-color-border-strong);
+      margin-bottom: 0;
+    }
+    .tab-btn {
+      padding: 9px 16px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mantine-color-dimmed);
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--mantine-color-text-strong); }
+    .tab-btn.is-active {
+      color: var(--mantine-color-blue-strong);
+      border-bottom-color: var(--mantine-color-blue);
+    }
+    .tabpanel { display: none; }
+    .tabpanel.is-active { display: block; }
+    .tabs .code-block { border-top-left-radius: 0; border-top-right-radius: 0; margin-top: 0; }
+
+    /* =========================================================
+       Method signature pills
+       ========================================================= */
+    .method {
+      margin: 24px 0 18px;
+      padding: 16px 18px;
+      border: 1px solid var(--mantine-color-border-strong);
+      border-radius: var(--mantine-radius-md);
+      background: var(--mantine-color-surface);
+    }
+    .method-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .method-name {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--mantine-color-text-strong);
+    }
+    .method-name .arg { color: var(--mantine-color-dimmed); }
+    .tag {
+      display: inline-block;
+      padding: 2px 7px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: 4px;
+    }
+    .tag.get    { color: #38d9a9; background: rgba(56, 217, 169, 0.12); }
+    .tag.post   { color: #4dabf7; background: rgba(77, 171, 247, 0.12); }
+    .tag.local  { color: #b197fc; background: rgba(177, 151, 252, 0.12); }
+    .endpoint {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--mantine-color-dimmed);
+    }
+    .method p { margin: 0; color: var(--mantine-color-text); font-size: 14px; }
+
+    /* =========================================================
+       Footer
+       ========================================================= */
+    .footer {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--mantine-color-border);
+      padding: 24px 56px;
+      font-size: 13px;
+      color: var(--mantine-color-dimmed);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* =========================================================
+       Responsive
+       ========================================================= */
+    @media (max-width: 1180px) {
+      :root { --toc-w: 0px; }
+      .layout { grid-template-columns: var(--sidebar-w) minmax(0, 1fr); }
+      .toc { display: none; }
+    }
+    @media (max-width: 820px) {
+      .layout { grid-template-columns: minmax(0, 1fr); }
+      .sidebar {
+        position: fixed;
+        top: var(--header-h);
+        left: 0; right: 0; bottom: 0;
+        width: 100%;
+        background: var(--mantine-color-body);
+        z-index: 40;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        height: calc(100vh - var(--header-h));
+      }
+      body.nav-open .sidebar { transform: translateX(0); }
+      .nav-toggle { display: grid; }
+      .header-search { display: none; }
+      .content { padding: 32px 22px 80px; }
+      .footer { padding: 22px; }
+      h1 { font-size: 32px; }
+      h2 { font-size: 22px; }
+    }
+
+    /* Scrollbar polish */
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-thumb { background: var(--mantine-color-border-strong); border-radius: 4px; }
+    *::-webkit-scrollbar-thumb:hover { background: var(--mantine-color-subtle); }
+    *::-webkit-scrollbar-track { background: transparent; }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================
+       Header
+       ======================================================== -->
+  <header class="app-header">
+    <button class="icon-btn nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <a class="brand-link" href="#overview">
+      <span class="brand-mark">e</span>
+      <span>eTalase SDK</span>
+      <span class="brand-version">v1.0</span>
+    </a>
+    <div class="header-spacer"></div>
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="docSearch" type="search" placeholder="Search the docs…" autocomplete="off" />
+      <span class="header-kbd">⌘K</span>
+    </div>
+  </header>
+
+  <!-- ========================================================
+       Layout
+       ======================================================== -->
+  <div class="layout">
+
+    <!-- =========================
+         Sidebar
+         ========================= -->
+    <aside class="sidebar" id="sidebar">
+      <nav>
+        <div class="nav-group">
+          <div class="nav-group-title">Getting started</div>
+          <a class="nav-link" href="#overview">Overview</a>
+          <a class="nav-link" href="#quickstart">Quick start</a>
+          <a class="nav-link" href="#install">Installation</a>
+          <a class="nav-link" href="#initialize">Initialize the client</a>
+          <a class="nav-link" href="#concepts">Concepts</a>
+          <a class="nav-link" href="#security">Domain security</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-title">API reference</div>
+          <a class="nav-link" href="#store">Store</a>
+          <a class="nav-link" href="#products">Products</a>
+          <a class="nav-link" href="#cart">Cart</a>
+          <a class="nav-link" href="#delivery">Delivery</a>
+          <a class="nav-link" href="#promo">Promo codes</a>
+          <a class="nav-link" href="#orders">Orders</a>
+          <a class="nav-link" href="#order-links">Order links</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-title">Guides</div>
+          <a class="nav-link" href="#recipes">Recipes</a>
+          <a class="nav-link" href="#frameworks">Framework usage</a>
+          <a class="nav-link" href="#errors">Error handling</a>
+          <a class="nav-link" href="#types">TypeScript types</a>
+          <a class="nav-link" href="#shopee">Shopee integration</a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-title">Resources</div>
+          <a class="nav-link" href="#configuration">Configuration</a>
+          <a class="nav-link" href="#backend">Backend requirements</a>
+          <a class="nav-link" href="#testing">Testing</a>
+          <a class="nav-link" href="#ai-guide">For AI agents</a>
+          <a class="nav-link" href="#faq">FAQ</a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- =========================
+         Main content
+         ========================= -->
+    <main class="content">
+
+      <!-- ===== Overview / Hero ===== -->
+      <section class="hero" id="overview">
+        <span class="eyebrow">TypeScript SDK · v1.0</span>
+        <h1>The storefront API client for eTalase.</h1>
+        <p class="lead">
+          A framework-agnostic TypeScript module that lets any custom website connect to the
+          eTalase storefront API — browse products, manage a cart, run checkout, apply promo
+          codes, and track orders, with a single public store key.
+        </p>
+        <div class="badge-row">
+          <span class="badge"><span class="dot"></span>Production ready</span>
+          <span class="badge">TypeScript first</span>
+          <span class="badge">ESM + CommonJS</span>
+          <span class="badge">No framework lock-in</span>
+          <span class="badge">Zero secret keys</span>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <h4>One-line install</h4>
+            <p>Drop into any web project — Next.js, Vite, plain HTML — with the same API surface.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h4>Public-key only</h4>
+            <p>Browser-safe. Domain authorization is enforced by the backend, never your code.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+            </div>
+            <h4>Full checkout flow</h4>
+            <p>Catalog, cart, delivery rates, promos, orders, and proof-of-payment uploads.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
+            </div>
+            <h4>Persistent cart</h4>
+            <p>Opt-in <code>localStorage</code> sync, scoped per store, with subscribe-based updates.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Quick start ===== -->
+      <section id="quickstart">
+        <h2>Quick start</h2>
+        <p>Three steps to your first request.</p>
+
+        <h3>1 · Install</h3>
+        <div class="tabs" data-tabs="install">
+          <div class="tablist" role="tablist">
+            <button class="tab-btn is-active" data-tab="npm">npm</button>
+            <button class="tab-btn" data-tab="pnpm">pnpm</button>
+            <button class="tab-btn" data-tab="yarn">yarn</button>
+            <button class="tab-btn" data-tab="bun">bun</button>
+          </div>
+          <div class="tabpanel is-active" data-panel="npm">
+            <div class="code-block">
+              <div class="code-block-head"><span>terminal</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>npm install etalase-module</code></pre>
+            </div>
+          </div>
+          <div class="tabpanel" data-panel="pnpm">
+            <div class="code-block">
+              <div class="code-block-head"><span>terminal</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>pnpm add etalase-module</code></pre>
+            </div>
+          </div>
+          <div class="tabpanel" data-panel="yarn">
+            <div class="code-block">
+              <div class="code-block-head"><span>terminal</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>yarn add etalase-module</code></pre>
+            </div>
+          </div>
+          <div class="tabpanel" data-panel="bun">
+            <div class="code-block">
+              <div class="code-block-head"><span>terminal</span><button class="copy-btn" type="button">Copy</button></div>
+              <pre><code>bun add etalase-module</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3>2 · Initialize</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import</span> { EtalaseClient } <span class="tok-kw">from</span> <span class="tok-str">'etalase-module'</span>;
+
+<span class="tok-kw">const</span> etalase = <span class="tok-kw">new</span> <span class="tok-fn">EtalaseClient</span>({
+  storeKey: <span class="tok-str">'store_public_xxx'</span>,
+  persist: <span class="tok-num">true</span>,
+});</code></pre>
+        </div>
+
+        <h3>3 · Make your first call</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> { data, total } = <span class="tok-kw">await</span> etalase.products.<span class="tok-fn">list</span>({ page: <span class="tok-num">1</span>, limit: <span class="tok-num">20</span> });
+
+<span class="tok-fn">console</span>.<span class="tok-fn">log</span>(<span class="tok-str">`Loaded ${data.length} of ${total} products`</span>);</code></pre>
+        </div>
+
+        <div class="callout success">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          <div class="callout-body">
+            <div class="callout-title">You're set</div>
+            That's the whole quick start. Continue to <a href="#concepts">Concepts</a> for the
+            mental model, or jump straight into the <a href="#store">API reference</a>.
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Installation ===== -->
+      <section id="install">
+        <h2>Installation</h2>
+        <p>
+          eTalase SDK ships dual-format bundles (ESM and CommonJS) with bundled TypeScript
+          declarations. No separate <code>@types</code> package is required.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>What you get</th><th>Path</th></tr></thead>
+            <tbody>
+              <tr><td>ESM build</td><td><code>dist/index.mjs</code></td></tr>
+              <tr><td>CJS build</td><td><code>dist/index.js</code></td></tr>
+              <tr><td>Types (ESM)</td><td><code>dist/index.d.mts</code></td></tr>
+              <tr><td>Types (CJS)</td><td><code>dist/index.d.ts</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Requirements</h3>
+        <ul>
+          <li><strong>TypeScript</strong> 4.7+ recommended (any version works at runtime).</li>
+          <li><strong>Browser</strong> with native <code>fetch</code> and ES2020 support.</li>
+          <li><strong>Node.js</strong> 18+ if used in server-side contexts.</li>
+        </ul>
+      </section>
+
+      <!-- ===== Initialize ===== -->
+      <section id="initialize">
+        <h2>Initialize the client</h2>
+        <p>
+          The <code>EtalaseClient</code> wires together every API namespace and the cart
+          manager. Pass your public store key — the SDK sends it as
+          <code>x-etalase-store-key</code> on every request.
+        </p>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import</span> { EtalaseClient } <span class="tok-kw">from</span> <span class="tok-str">'etalase-module'</span>;
+
+<span class="tok-kw">export const</span> etalase = <span class="tok-kw">new</span> <span class="tok-fn">EtalaseClient</span>({
+  storeKey: <span class="tok-str">'store_public_xxx'</span>,
+  apiUrl: <span class="tok-str">'https://api.e-talase.com'</span>, <span class="tok-com">// optional</span>
+  persist: <span class="tok-num">true</span>,                       <span class="tok-com">// optional, enables cart localStorage</span>
+});</code></pre>
+        </div>
+
+        <h3>Factory form</h3>
+        <p>If you prefer composition over <code>new</code>, the factory returns the same instance:</p>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import</span> { createEtalaseClient } <span class="tok-kw">from</span> <span class="tok-str">'etalase-module'</span>;
+
+<span class="tok-kw">export const</span> etalase = <span class="tok-fn">createEtalaseClient</span>({
+  storeKey: <span class="tok-str">'store_public_xxx'</span>,
+});</code></pre>
+        </div>
+
+        <div class="callout info">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div class="callout-body">
+            <div class="callout-title">Production default</div>
+            <code>apiUrl</code> is optional. When omitted, the SDK uses
+            <code>https://api.e-talase.com</code>.
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Concepts ===== -->
+      <section id="concepts">
+        <h2>Concepts</h2>
+        <p>A short tour of the moving parts.</p>
+
+        <h3>The client</h3>
+        <p>
+          <code>EtalaseClient</code> is a thin orchestrator. It owns a single
+          <code>EtalaseApiClient</code> (handles HTTP) and instantiates one namespace per API
+          domain. Everything you need hangs off the client instance.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Property</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>client.store</code></td><td>Public store profile and storefront settings.</td></tr>
+              <tr><td><code>client.products</code></td><td>Catalog browsing, paginated lists, photos only.</td></tr>
+              <tr><td><code>client.cart</code></td><td>Local in-memory cart with optional persistence.</td></tr>
+              <tr><td><code>client.delivery</code></td><td>Courier rate estimates.</td></tr>
+              <tr><td><code>client.promo</code></td><td>Promo code validation.</td></tr>
+              <tr><td><code>client.orders</code></td><td>Order creation, tracking, payment proof.</td></tr>
+              <tr><td><code>client.orderLinks</code></td><td>Public order link resolution.</td></tr>
+              <tr><td><code>client.api</code></td><td>Low-level HTTP for advanced cases.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Public vs secret keys</h3>
+        <p>
+          The SDK accepts <strong>only public store keys</strong>
+          (<code>store_public_*</code>). Public keys identify the storefront and rely on the
+          backend's per-domain authorization. Never paste a backend secret into client code.
+        </p>
+
+        <h3>Cart lives in the browser</h3>
+        <p>
+          <code>CartManager</code> never calls the backend. It maintains an in-memory list of
+          items, fires events on mutation, and (with <code>persist: true</code>) mirrors itself
+          to <code>localStorage</code> under <code>etalase-cart-&lt;storeKey&gt;</code>.
+        </p>
+      </section>
+
+      <!-- ===== Security ===== -->
+      <section id="security">
+        <h2>Domain security</h2>
+        <p>
+          The SDK does not verify merchant domains itself. It sends the public store key, the
+          browser attaches the current <code>Origin</code>, and the backend decides whether the
+          combination is allowed.
+        </p>
+
+        <div class="feature-grid">
+          <div class="feature">
+            <h4>The SDK sends</h4>
+            <p><code>x-etalase-store-key</code> on every request, plus a normal browser fetch from your storefront domain.</p>
+          </div>
+          <div class="feature">
+            <h4>The browser sends</h4>
+            <p>The <code>Origin</code> header automatically. Application code must not set it manually.</p>
+          </div>
+          <div class="feature">
+            <h4>The backend validates</h4>
+            <p>The public key, the origin, and whether that origin is verified for the store.</p>
+          </div>
+          <div class="feature">
+            <h4>The SDK never uses</h4>
+            <p>Secret keys, wildcard CORS, manual <code>Origin</code>, or <code>mode: "no-cors"</code>.</p>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="callout-body">
+            <div class="callout-title">Add your origin to the dashboard</div>
+            Before testing on a new domain (including <code>http://localhost:5173</code>), add
+            the exact origin in your eTalase dashboard. Unauthorized origins fail with the
+            unauthorized-domain error — see <a href="#errors">Error handling</a>.
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           API REFERENCE
+           ===================================================== -->
+
+      <!-- ===== Store ===== -->
+      <section id="store">
+        <h2>Store</h2>
+        <p>Read the merchant storefront profile and public settings.</p>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">store.<span class="tok-fn">getInformation</span>()</span>
+            <span class="endpoint">→ <code>{ info, settings }</code></span>
+          </div>
+          <p>One-shot helper that combines profile and settings into a single object.</p>
+        </div>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">store.<span class="tok-fn">getInfo</span>()</span>
+            <span class="endpoint">/stores/:id/public</span>
+          </div>
+          <p>Public store profile — store name, store photo URL.</p>
+        </div>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">store.<span class="tok-fn">getSettings</span>()</span>
+            <span class="endpoint">/settings/public</span>
+          </div>
+          <p>Storefront settings — currency, payment methods, delivery defaults, social links.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> store = <span class="tok-kw">await</span> etalase.store.<span class="tok-fn">getInformation</span>();
+
+<span class="tok-fn">console</span>.<span class="tok-fn">log</span>({
+  name: store.info?.storeName ?? store.settings?.storeName,
+  photoUrl: store.info?.storePhotoUrl ?? store.settings?.logoUrl,
+  currency: store.settings?.currency,
+  payments: {
+    bankTransfer: store.settings?.bankTransferEnabled,
+    midtrans: store.settings?.midtransEnabled,
+  },
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Products ===== -->
+      <section id="products">
+        <h2>Products</h2>
+        <p>Browse the merchant catalog. All methods return strongly-typed responses.</p>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">products.<span class="tok-fn">list</span>(<span class="arg">{ page?, limit? }</span>)</span>
+            <span class="endpoint">→ <code>PaginatedResponse&lt;Product&gt;</code></span>
+          </div>
+          <p>Paginated product list with full product data (price, stock, images, variants).</p>
+        </div>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">products.<span class="tok-fn">get</span>(<span class="arg">id</span>)</span>
+            <span class="endpoint">→ <code>Product</code></span>
+          </div>
+          <p>Single product by ID.</p>
+        </div>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">products.<span class="tok-fn">listPhotos</span>(<span class="arg">{ page?, limit? }</span>)</span>
+            <span class="endpoint">→ <code>PaginatedResponse&lt;ProductPhotoSummary&gt;</code></span>
+          </div>
+          <p>Lightweight list of product IDs, names, and photos only — ideal for gallery views.</p>
+        </div>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">products.<span class="tok-fn">getPhotos</span>(<span class="arg">id</span>)</span>
+            <span class="endpoint">→ <code>ProductPhotoSummary</code></span>
+          </div>
+          <p>Photos for a single product.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> { data, total } = <span class="tok-kw">await</span> etalase.products.<span class="tok-fn">list</span>({ page: <span class="tok-num">1</span>, limit: <span class="tok-num">20</span> });
+<span class="tok-kw">const</span> product = <span class="tok-kw">await</span> etalase.products.<span class="tok-fn">get</span>(data[<span class="tok-num">0</span>].id);</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Cart ===== -->
+      <section id="cart">
+        <h2>Cart</h2>
+        <p>
+          A local cart with an event-emitter API and optional <code>localStorage</code>
+          persistence. The cart never calls the backend by itself; it produces the payload that
+          checkout, delivery, and promo APIs consume.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th>Signature</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><span class="tag local">local</span></td><td><code>addItem(product, quantity?, variant?)</code></td><td>Add a product or variant. Increments quantity if already present.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>removeItem(key)</code></td><td>Remove by <code>productId</code> or <code>productId:variantId</code>.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>updateQuantity(key, quantity)</code></td><td>Set new quantity. Values ≤ 0 remove the line.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>clear()</code></td><td>Empty the cart.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>getItems()</code></td><td>Return a snapshot of current cart items.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>getTotal()</code></td><td>Sum using <code>discountedPrice</code> when available.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>getItemCount()</code></td><td>Total quantity across all lines.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>getTotalWeightGrams()</code></td><td>Total cart weight (defaults to 500g per item if missing).</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>toCheckoutItems()</code></td><td>Map to the shape consumed by checkout and promo APIs.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>subscribe(cb)</code></td><td>Run <code>cb</code> after every mutation.</td></tr>
+              <tr><td><span class="tag local">local</span></td><td><code>unsubscribe(cb)</code></td><td>Detach a listener.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Subscribing to changes</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">function</span> <span class="tok-fn">render</span>() {
+  <span class="tok-kw">const</span> count = etalase.cart.<span class="tok-fn">getItemCount</span>();
+  <span class="tok-fn">document</span>.<span class="tok-fn">querySelector</span>(<span class="tok-str">'#cartBadge'</span>)!.textContent = <span class="tok-fn">String</span>(count);
+}
+
+etalase.cart.<span class="tok-fn">subscribe</span>(render);
+<span class="tok-fn">render</span>();</code></pre>
+        </div>
+
+        <div class="callout info">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div class="callout-body">
+            <strong>Persistence key.</strong> When <code>persist: true</code>, the cart is stored
+            at <code>etalase-cart-&lt;storeKey&gt;</code>. Each store has its own bucket.
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Delivery ===== -->
+      <section id="delivery">
+        <h2>Delivery</h2>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag post">POST</span>
+            <span class="method-name">delivery.<span class="tok-fn">estimate</span>(<span class="arg">payload</span>)</span>
+            <span class="endpoint">/delivery/estimate · → <code>DeliveryOption[]</code></span>
+          </div>
+          <p>Returns the courier options and prices the merchant has enabled.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> options = <span class="tok-kw">await</span> etalase.delivery.<span class="tok-fn">estimate</span>({
+  destinationAddress: <span class="tok-str">'Jl. Sudirman No. 1, Jakarta'</span>,
+  totalWeightGrams: etalase.cart.<span class="tok-fn">getTotalWeightGrams</span>(),
+  locationId: <span class="tok-str">'optional_location_id'</span>,
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Promo ===== -->
+      <section id="promo">
+        <h2>Promo codes</h2>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag post">POST</span>
+            <span class="method-name">promo.<span class="tok-fn">validate</span>(<span class="arg">payload</span>)</span>
+            <span class="endpoint">/promo-codes/validate · → <code>PromoValidationResult</code></span>
+          </div>
+          <p>Validate one or more codes against the current cart and selected delivery price.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> promo = <span class="tok-kw">await</span> etalase.promo.<span class="tok-fn">validate</span>({
+  codes: [<span class="tok-str">'HEMAT10'</span>, <span class="tok-str">'WELCOME'</span>],
+  items: etalase.cart.<span class="tok-fn">toCheckoutItems</span>(),
+  deliveryPrice: <span class="tok-num">15000</span>,
+});
+
+<span class="tok-fn">console</span>.<span class="tok-fn">log</span>(promo.valid, promo.invalid, promo.finalTotal);</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Orders ===== -->
+      <section id="orders">
+        <h2>Orders</h2>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag post">POST</span>
+            <span class="method-name">orders.<span class="tok-fn">create</span>(<span class="arg">payload</span>)</span>
+            <span class="endpoint">/orders · → <code>Order</code></span>
+          </div>
+          <p>
+            Creates an order. The SDK injects the configured public store key into the request
+            body for backend compatibility — you do not need to pass <code>storeId</code>.
+          </p>
+        </div>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">orders.<span class="tok-fn">track</span>(<span class="arg">orderId, phone</span>)</span>
+            <span class="endpoint">/orders/track · → <code>PublicOrderTracking</code></span>
+          </div>
+          <p>Public status lookup. The phone number is the recipient phone on the order.</p>
+        </div>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag post">POST</span>
+            <span class="method-name">orders.<span class="tok-fn">submitProof</span>(<span class="arg">orderId, file, phone</span>)</span>
+            <span class="endpoint">/orders/:id/proof · → <code>{ proofUrl }</code></span>
+          </div>
+          <p>Upload bank transfer payment proof. <code>file</code> is a browser <code>File</code> or <code>Blob</code>.</p>
+        </div>
+
+        <h3>Create an order</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> order = <span class="tok-kw">await</span> etalase.orders.<span class="tok-fn">create</span>({
+  items: etalase.cart.<span class="tok-fn">toCheckoutItems</span>(),
+  address: {
+    recipientName: <span class="tok-str">'Budi Santoso'</span>,
+    phone: <span class="tok-str">'08123456789'</span>,
+    street: <span class="tok-str">'Jl. Melati No. 12'</span>,
+    city: <span class="tok-str">'Jakarta Selatan'</span>,
+    province: <span class="tok-str">'DKI Jakarta'</span>,
+    postalCode: <span class="tok-str">'12190'</span>,
+  },
+  deliveryOption: options[<span class="tok-num">0</span>],
+  promoCodes: [<span class="tok-str">'HEMAT10'</span>],
+  paymentMethod: <span class="tok-str">'bank_transfer'</span>,
+});</code></pre>
+        </div>
+
+        <h3>Track an order</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> tracking = <span class="tok-kw">await</span> etalase.orders.<span class="tok-fn">track</span>(<span class="tok-str">'order_id'</span>, <span class="tok-str">'08123456789'</span>);
+<span class="tok-fn">console</span>.<span class="tok-fn">log</span>(tracking.status, tracking.trackingNumber);</code></pre>
+        </div>
+
+        <h3>Upload transfer proof</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> input = <span class="tok-fn">document</span>.<span class="tok-fn">querySelector</span>&lt;HTMLInputElement&gt;(<span class="tok-str">'#proof'</span>);
+<span class="tok-kw">const</span> file = input?.files?.[<span class="tok-num">0</span>];
+
+<span class="tok-kw">if</span> (file) {
+  <span class="tok-kw">const</span> result = <span class="tok-kw">await</span> etalase.orders.<span class="tok-fn">submitProof</span>(<span class="tok-str">'order_id'</span>, file, <span class="tok-str">'08123456789'</span>);
+  <span class="tok-fn">console</span>.<span class="tok-fn">log</span>(result.proofUrl);
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Order Links ===== -->
+      <section id="order-links">
+        <h2>Order links</h2>
+
+        <div class="method">
+          <div class="method-head">
+            <span class="tag get">GET</span>
+            <span class="method-name">orderLinks.<span class="tok-fn">getPublic</span>(<span class="arg">linkId</span>)</span>
+            <span class="endpoint">/order-links/:id/public · → <code>OrderLinkPublic</code></span>
+          </div>
+          <p>Resolve a merchant-created public order link. Useful for "buy these items" sharable URLs.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> link = <span class="tok-kw">await</span> etalase.orderLinks.<span class="tok-fn">getPublic</span>(<span class="tok-str">'link_123'</span>);
+
+<span class="tok-kw">for</span> (<span class="tok-kw">const</span> item <span class="tok-kw">of</span> link.items) {
+  <span class="tok-kw">if</span> (item.product) {
+    etalase.cart.<span class="tok-fn">addItem</span>(item.product <span class="tok-kw">as any</span>, item.quantity);
+  }
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           GUIDES
+           ===================================================== -->
+
+      <!-- ===== Recipes ===== -->
+      <section id="recipes">
+        <h2>Recipes</h2>
+        <p>Drop-in examples for common storefront flows.</p>
+
+        <h3>End-to-end checkout</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-com">// 1. Add to cart</span>
+<span class="tok-kw">const</span> product = <span class="tok-kw">await</span> etalase.products.<span class="tok-fn">get</span>(<span class="tok-str">'prod_abc123'</span>);
+<span class="tok-kw">const</span> variant = product.variants?.<span class="tok-fn">find</span>((v) =&gt; v.name === <span class="tok-str">'Large'</span>);
+etalase.cart.<span class="tok-fn">addItem</span>(product, <span class="tok-num">2</span>, variant);
+
+<span class="tok-com">// 2. Estimate delivery</span>
+<span class="tok-kw">const</span> options = <span class="tok-kw">await</span> etalase.delivery.<span class="tok-fn">estimate</span>({
+  destinationAddress: <span class="tok-str">'Jl. Melati No. 12, Jakarta Selatan'</span>,
+  totalWeightGrams: etalase.cart.<span class="tok-fn">getTotalWeightGrams</span>(),
+});
+
+<span class="tok-com">// 3. (Optional) validate a promo</span>
+<span class="tok-kw">const</span> promo = <span class="tok-kw">await</span> etalase.promo.<span class="tok-fn">validate</span>({
+  codes: [<span class="tok-str">'HEMAT10'</span>],
+  items: etalase.cart.<span class="tok-fn">toCheckoutItems</span>(),
+  deliveryPrice: options[<span class="tok-num">0</span>].price,
+});
+
+<span class="tok-com">// 4. Create the order</span>
+<span class="tok-kw">const</span> order = <span class="tok-kw">await</span> etalase.orders.<span class="tok-fn">create</span>({
+  items: etalase.cart.<span class="tok-fn">toCheckoutItems</span>(),
+  address: {
+    recipientName: <span class="tok-str">'Budi Santoso'</span>,
+    phone: <span class="tok-str">'08123456789'</span>,
+    street: <span class="tok-str">'Jl. Melati No. 12'</span>,
+    city: <span class="tok-str">'Jakarta Selatan'</span>,
+    province: <span class="tok-str">'DKI Jakarta'</span>,
+    postalCode: <span class="tok-str">'12190'</span>,
+  },
+  deliveryOption: options[<span class="tok-num">0</span>],
+  promoCodes: promo.valid.<span class="tok-fn">map</span>((p) =&gt; p.code),
+  paymentMethod: <span class="tok-str">'bank_transfer'</span>,
+});
+
+<span class="tok-com">// 5. Show next steps</span>
+<span class="tok-kw">if</span> (order.paymentMethod === <span class="tok-str">'midtrans'</span> &amp;&amp; order.midtransRedirectUrl) {
+  <span class="tok-fn">window</span>.location.href = order.midtransRedirectUrl;
+} <span class="tok-kw">else</span> {
+  <span class="tok-fn">console</span>.<span class="tok-fn">log</span>(<span class="tok-str">'Transfer to:'</span>, order.bankDetails);
+}</code></pre>
+        </div>
+
+        <h3>Lightweight product gallery</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> { data } = <span class="tok-kw">await</span> etalase.products.<span class="tok-fn">listPhotos</span>({ page: <span class="tok-num">1</span>, limit: <span class="tok-num">12</span> });
+
+<span class="tok-kw">const</span> html = data
+  .<span class="tok-fn">map</span>((p) =&gt; <span class="tok-str">`&lt;img src="</span>${p.photos[<span class="tok-num">0</span>]?.imageUrl}<span class="tok-str">" alt="</span>${p.productName}<span class="tok-str">" /&gt;`</span>)
+  .<span class="tok-fn">join</span>(<span class="tok-str">''</span>);
+
+<span class="tok-fn">document</span>.<span class="tok-fn">querySelector</span>(<span class="tok-str">'#gallery'</span>)!.innerHTML = html;</code></pre>
+        </div>
+
+        <h3>Validate promo before checkout</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> promo = <span class="tok-kw">await</span> etalase.promo.<span class="tok-fn">validate</span>({
+  codes: [<span class="tok-str">'HEMAT10'</span>, <span class="tok-str">'WELCOME'</span>],
+  items: etalase.cart.<span class="tok-fn">toCheckoutItems</span>(),
+  deliveryPrice: <span class="tok-num">15000</span>,
+});
+
+<span class="tok-fn">console</span>.<span class="tok-fn">log</span>({
+  validCodes: promo.valid.<span class="tok-fn">map</span>((p) =&gt; p.code),
+  invalidCodes: promo.invalid,
+  finalTotal: promo.finalTotal,
+});</code></pre>
+        </div>
+
+        <h3>Resolve a shared order link</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">const</span> link = <span class="tok-kw">await</span> etalase.orderLinks.<span class="tok-fn">getPublic</span>(<span class="tok-str">'link_123'</span>);
+
+<span class="tok-kw">for</span> (<span class="tok-kw">const</span> item <span class="tok-kw">of</span> link.items) {
+  <span class="tok-kw">if</span> (item.product) {
+    etalase.cart.<span class="tok-fn">addItem</span>(item.product <span class="tok-kw">as any</span>, item.quantity);
+  }
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Framework usage ===== -->
+      <section id="frameworks">
+        <h2>Framework usage</h2>
+        <p>
+          The package is framework-agnostic. There are no React components or hooks; integrate it
+          with the patterns your stack already uses.
+        </p>
+
+        <h3>React / Next.js</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>etalase.ts</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import</span> { createEtalaseClient } <span class="tok-kw">from</span> <span class="tok-str">'etalase-module'</span>;
+
+<span class="tok-kw">export const</span> etalase = <span class="tok-fn">createEtalaseClient</span>({
+  storeKey: <span class="tok-fn">process</span>.env.NEXT_PUBLIC_ETALASE_STORE_KEY!,
+  persist: <span class="tok-kw">typeof</span> window !== <span class="tok-str">'undefined'</span>,
+});</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>useCart.ts</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import</span> { useSyncExternalStore } <span class="tok-kw">from</span> <span class="tok-str">'react'</span>;
+<span class="tok-kw">import</span> { etalase } <span class="tok-kw">from</span> <span class="tok-str">'./etalase'</span>;
+
+<span class="tok-kw">export function</span> <span class="tok-fn">useCart</span>() {
+  <span class="tok-kw">return</span> <span class="tok-fn">useSyncExternalStore</span>(
+    (cb) =&gt; {
+      etalase.cart.<span class="tok-fn">subscribe</span>(cb);
+      <span class="tok-kw">return</span> () =&gt; etalase.cart.<span class="tok-fn">unsubscribe</span>(cb);
+    },
+    () =&gt; etalase.cart.<span class="tok-fn">getItems</span>(),
+    () =&gt; [],
+  );
+}</code></pre>
+        </div>
+
+        <h3>Vue 3</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>composables/useCart.ts</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import</span> { ref, onMounted, onUnmounted } <span class="tok-kw">from</span> <span class="tok-str">'vue'</span>;
+<span class="tok-kw">import</span> { etalase } <span class="tok-kw">from</span> <span class="tok-str">'./etalase'</span>;
+
+<span class="tok-kw">export function</span> <span class="tok-fn">useCart</span>() {
+  <span class="tok-kw">const</span> items = <span class="tok-fn">ref</span>(etalase.cart.<span class="tok-fn">getItems</span>());
+  <span class="tok-kw">const</span> sync = () =&gt; { items.value = etalase.cart.<span class="tok-fn">getItems</span>(); };
+
+  <span class="tok-fn">onMounted</span>(() =&gt; etalase.cart.<span class="tok-fn">subscribe</span>(sync));
+  <span class="tok-fn">onUnmounted</span>(() =&gt; etalase.cart.<span class="tok-fn">unsubscribe</span>(sync));
+
+  <span class="tok-kw">return</span> { items };
+}</code></pre>
+        </div>
+
+        <h3>Plain JavaScript / CDN</h3>
+        <div class="code-block">
+          <div class="code-block-head"><span>html</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code>&lt;script type=<span class="tok-str">"module"</span>&gt;
+  <span class="tok-kw">import</span> { EtalaseClient } <span class="tok-kw">from</span> <span class="tok-str">'https://esm.sh/etalase-module'</span>;
+
+  <span class="tok-kw">const</span> etalase = <span class="tok-kw">new</span> <span class="tok-fn">EtalaseClient</span>({ storeKey: <span class="tok-str">'store_public_xxx'</span> });
+  <span class="tok-kw">const</span> products = <span class="tok-kw">await</span> etalase.products.<span class="tok-fn">list</span>();
+  <span class="tok-fn">console</span>.<span class="tok-fn">log</span>(products.total);
+&lt;/script&gt;</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Errors ===== -->
+      <section id="errors">
+        <h2>Error handling</h2>
+        <p>
+          The SDK throws three distinct kinds of errors. Use the class to discriminate cleanly.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Error</th><th>Thrown when</th></tr></thead>
+            <tbody>
+              <tr><td><code>Error</code> (generic)</td><td>Missing or invalid configuration (e.g. no <code>storeKey</code>).</td></tr>
+              <tr><td><code>EtalaseApiError</code></td><td>Backend returns a non-2xx response. <code>status</code> and <code>message</code> are populated.</td></tr>
+              <tr><td><code>EtalaseNetworkError</code></td><td>Browser fails to reach the backend, typically because of a CORS block.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import</span> {
+  EtalaseApiError,
+  EtalaseNetworkError,
+  UNAUTHORIZED_DOMAIN_MESSAGE,
+} <span class="tok-kw">from</span> <span class="tok-str">'etalase-module'</span>;
+
+<span class="tok-kw">try</span> {
+  <span class="tok-kw">await</span> etalase.products.<span class="tok-fn">list</span>();
+} <span class="tok-kw">catch</span> (error) {
+  <span class="tok-kw">if</span> (error <span class="tok-kw">instanceof</span> EtalaseApiError) {
+    <span class="tok-fn">console</span>.<span class="tok-fn">log</span>(error.status, error.message);
+  }
+
+  <span class="tok-kw">if</span> (error <span class="tok-kw">instanceof</span> EtalaseNetworkError) {
+    <span class="tok-fn">console</span>.<span class="tok-fn">log</span>(<span class="tok-str">'Network or CORS failure:'</span>, error.message);
+  }
+}</code></pre>
+        </div>
+
+        <div class="callout danger">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="callout-body">
+            <div class="callout-title">Missing store key</div>
+            <code>eTalase SDK requires a public store key. Pass storeKey to ETalaseProvider.</code>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="callout-body">
+            <div class="callout-title">Unauthorized domain</div>
+            <code>This domain is not authorized for this eTalase store. Add and verify this domain in your eTalase dashboard.</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Types ===== -->
+      <section id="types">
+        <h2>TypeScript types</h2>
+        <p>
+          Every domain object is exported as a type. Import what you need directly from the
+          package root — no separate <code>@types</code> dependency.
+        </p>
+
+        <div class="feature-grid">
+          <div class="feature">
+            <h4>Catalog</h4>
+            <p><code>Product</code>, <code>ProductImage</code>, <code>ProductVariant</code>, <code>ProductPhotoSummary</code>, <code>PaginatedResponse&lt;T&gt;</code>.</p>
+          </div>
+          <div class="feature">
+            <h4>Cart &amp; checkout</h4>
+            <p><code>CartItem</code>, <code>CheckoutPayload</code>, <code>Address</code>, <code>BankDetails</code>.</p>
+          </div>
+          <div class="feature">
+            <h4>Delivery</h4>
+            <p><code>DeliveryOption</code>, <code>DeliveryEstimatePayload</code>.</p>
+          </div>
+          <div class="feature">
+            <h4>Promo</h4>
+            <p><code>PromoValidatePayload</code>, <code>PromoValidationResult</code>, <code>AppliedPromoCode</code>.</p>
+          </div>
+          <div class="feature">
+            <h4>Orders</h4>
+            <p><code>Order</code>, <code>OrderItem</code>, <code>OrderStatus</code>, <code>PublicOrderTracking</code>.</p>
+          </div>
+          <div class="feature">
+            <h4>Store &amp; links</h4>
+            <p><code>PublicStoreInfo</code>, <code>PublicSettings</code>, <code>StoreInformation</code>, <code>OrderLinkPublic</code>.</p>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code><span class="tok-kw">import type</span> { Product, CartItem, Order } <span class="tok-kw">from</span> <span class="tok-str">'etalase-module'</span>;
+
+<span class="tok-kw">function</span> <span class="tok-fn">subtotalFor</span>(items: CartItem[]): <span class="tok-ty">number</span> {
+  <span class="tok-kw">return</span> items.<span class="tok-fn">reduce</span>(
+    (sum, i) =&gt; sum + (i.product.discountedPrice ?? i.product.price) * i.quantity,
+    <span class="tok-num">0</span>,
+  );
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- ===== Shopee ===== -->
+      <section id="shopee">
+        <h2>Shopee integration</h2>
+        <p>
+          The Shopee module is a server-side SDK subset for syncing marketplace orders into
+          eTalase. It signs Shopee Open Platform v2 requests, reads order details, and prepares
+          logistics calls for shipping labels and tracking.
+        </p>
+
+        <div class="callout warning">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="callout-body">
+            <div class="callout-title">Backend only</div>
+            <p>
+              Do not run this module in browser storefront code. Shopee <code>partnerKey</code>,
+              <code>accessToken</code>, and <code>refreshToken</code> values are secrets and must
+              stay in your backend or scheduled worker.
+            </p>
+          </div>
+        </div>
+
+        <h3>Import and initialize</h3>
+        <p>
+          Use the dedicated subpath so backend jobs can depend only on the Shopee subset.
+          Store credentials in environment variables or your backend secret manager.
+        </p>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code>import { createShopeeClient } from 'etalase-module/shopee';
+
+const shopee = createShopeeClient({
+  partnerId: process.env.SHOPEE_PARTNER_ID!,
+  partnerKey: process.env.SHOPEE_PARTNER_KEY!,
+  shopId: process.env.SHOPEE_SHOP_ID!,
+  accessToken: process.env.SHOPEE_ACCESS_TOKEN!,
+  environment: 'production',
+});</code></pre>
+        </div>
+
+        <h3>Connect a shop</h3>
+        <p>
+          Send the merchant to Shopee's authorization URL, then exchange the callback
+          <code>code</code> for tokens. Persist the returned token pair per store/shop.
+        </p>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code>const authUrl = await shopee.createAuthorizationUrl({
+  redirectUrl: 'https://api.e-talase.com/integrations/shopee/callback',
+  state: storeId,
+});
+
+const tokens = await shopee.getTokenByCode({
+  code: callbackCode,
+  shopId: callbackShopId,
+});
+
+await saveShopeeConnection(storeId, {
+  shopId: tokens.shop_id,
+  accessToken: tokens.access_token,
+  refreshToken: tokens.refresh_token,
+  expiresIn: tokens.expire_in,
+});</code></pre>
+        </div>
+
+        <h3>Refresh access tokens</h3>
+        <p>
+          Shopee access tokens expire. Refresh them before scheduled sync jobs or when Shopee
+          returns an expired-token error.
+        </p>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code>const nextTokens = await shopee.refreshAccessToken({
+  refreshToken: connection.refreshToken,
+  shopId: connection.shopId,
+});
+
+await updateShopeeConnection(storeId, {
+  accessToken: nextTokens.access_token,
+  refreshToken: nextTokens.refresh_token,
+  expiresIn: nextTokens.expire_in,
+});</code></pre>
+        </div>
+
+        <h3>Sync orders</h3>
+        <p>
+          Use <code>listSyncOrders</code> for the normal scheduled sync path. It pages through
+          <code>get_order_list</code>, fetches details with <code>get_order_detail</code>, and
+          returns a normalized shape with the raw Shopee payload attached.
+        </p>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code>const orders = await shopee.listSyncOrders(
+  {
+    timeRangeField: 'update_time',
+    timeFrom: new Date(Date.now() - 60 * 60 * 1000),
+    timeTo: new Date(),
+    pageSize: 50,
+  },
+  {
+    shopId: connection.shopId,
+    accessToken: connection.accessToken,
+  },
+);
+
+for (const order of orders) {
+  await upsertMarketplaceOrder({
+    storeId,
+    source: order.source,
+    externalOrderId: order.externalOrderId,
+    status: order.status,
+    recipient: order.recipient,
+    shipping: order.shipping,
+    items: order.items,
+    totalAmount: order.totalAmount,
+    raw: order.raw,
+  });
+}</code></pre>
+        </div>
+
+        <h3>Shipping label and tracking</h3>
+        <p>
+          Read the shipping parameters before calling <code>shipOrder</code>. After shipment is
+          arranged, create and poll the shipping document, then download the label. Use
+          <code>getTrackingInfo</code> for tracking events.
+        </p>
+        <div class="code-block">
+          <div class="code-block-head"><span>typescript</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><code>const auth = {
+  shopId: connection.shopId,
+  accessToken: connection.accessToken,
+};
+
+const shipping = await shopee.getShippingParameter(
+  {
+    orderSn: order.externalOrderId,
+    packageNumber: order.shipping.packageNumber,
+  },
+  auth,
+);
+
+await shopee.shipOrder(
+  {
+    orderSn: order.externalOrderId,
+    packageNumber: order.shipping.packageNumber,
+    pickup: shipping.pickup,
+    dropoff: shipping.dropoff,
+  },
+  auth,
+);
+
+const documentParams = await shopee.getShippingDocumentParameter(
+  {
+    orderSn: order.externalOrderId,
+    packageNumber: order.shipping.packageNumber,
+  },
+  auth,
+);
+
+await shopee.createShippingDocument(
+  {
+    orderSn: order.externalOrderId,
+    packageNumber: order.shipping.packageNumber,
+    shippingDocumentType: documentParams.suggest_shipping_document_type,
+  },
+  auth,
+);
+
+const label = await shopee.downloadShippingDocument(
+  {
+    orderList: [
+      {
+        orderSn: order.externalOrderId,
+        packageNumber: order.shipping.packageNumber,
+      },
+    ],
+    shippingDocumentType: documentParams.suggest_shipping_document_type,
+  },
+  auth,
+);
+
+const tracking = await shopee.getTrackingInfo(
+  {
+    orderSn: order.externalOrderId,
+    packageNumber: order.shipping.packageNumber,
+  },
+  auth,
+);</code></pre>
+        </div>
+
+        <h3>Operational notes</h3>
+        <ul>
+          <li>Persist Shopee tokens per eTalase store and Shopee shop.</li>
+          <li>Use <code>update_time</code> for incremental sync jobs and keep a successful-sync watermark.</li>
+          <li>Use <code>externalOrderId</code> as the idempotency key when upserting marketplace orders.</li>
+          <li>Store raw Shopee payloads for reconciliation, but avoid exposing them directly to storefront clients.</li>
+          <li>Handle <code>ShopeeApiError</code> by logging <code>errorCode</code> and <code>requestId</code>.</li>
+        </ul>
+      </section>
+
+      <!-- ===== Configuration ===== -->
+      <section id="configuration">
+        <h2>Configuration reference</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Option</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>storeKey</code></td>
+                <td><code>string</code></td>
+                <td>Yes</td>
+                <td>Public store key (<code>store_public_*</code>). Never use a backend secret.</td>
+              </tr>
+              <tr>
+                <td><code>apiUrl</code></td>
+                <td><code>string</code></td>
+                <td>No</td>
+                <td>Backend base URL. Defaults to <code>https://api.e-talase.com</code>.</td>
+              </tr>
+              <tr>
+                <td><code>persist</code></td>
+                <td><code>boolean</code></td>
+                <td>No</td>
+                <td>Mirrors cart state into <code>localStorage</code>. Defaults to <code>false</code>.</td>
+              </tr>
+              <tr>
+                <td><code>credentials</code></td>
+                <td><code>RequestCredentials</code></td>
+                <td>No</td>
+                <td>Only set when the backend explicitly requires cookie-based behavior.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Exports at a glance</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Export</th><th>Kind</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td><code>EtalaseClient</code></td><td>class</td><td>Primary entry point.</td></tr>
+              <tr><td><code>createEtalaseClient</code></td><td>factory</td><td>Functional alternative to <code>new EtalaseClient</code>.</td></tr>
+              <tr><td><code>EtalaseApiClient</code></td><td>class</td><td>Low-level HTTP client used internally.</td></tr>
+              <tr><td><code>ETalaseProvider</code></td><td>class</td><td>Framework-agnostic wrapper with a <code>.client</code> property.</td></tr>
+              <tr><td><code>createETalaseProvider</code></td><td>factory</td><td>Functional form of the provider.</td></tr>
+              <tr><td><code>CartManager</code></td><td>class</td><td>Local cart implementation.</td></tr>
+              <tr><td><code>DEFAULT_ETALASE_API_URL</code></td><td>const</td><td><code>'https://api.e-talase.com'</code>.</td></tr>
+              <tr><td><code>createEtalaseConfig</code></td><td>fn</td><td>Validate &amp; normalize SDK config.</td></tr>
+              <tr><td><code>EtalaseApiError</code></td><td>class</td><td>Backend non-2xx errors.</td></tr>
+              <tr><td><code>EtalaseNetworkError</code></td><td>class</td><td>Fetch / CORS failures.</td></tr>
+              <tr><td><code>UNAUTHORIZED_DOMAIN_MESSAGE</code></td><td>const</td><td>Stable string for unauthorized-domain UX.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== Backend ===== -->
+      <section id="backend">
+        <h2>Backend requirements</h2>
+        <p>
+          The SDK is ready for merchant-hosted domains, but the backend must enforce the
+          security model. If you operate the eTalase backend, ensure each of the following:
+        </p>
+        <ul>
+          <li>Accept the public store key from <code>x-etalase-store-key</code>.</li>
+          <li>Read the browser-provided <code>Origin</code> header.</li>
+          <li>Look up the store by its public store key.</li>
+          <li>Allow the request only when the origin is verified for that store.</li>
+          <li>Return CORS headers for the exact allowed origin — never <code>*</code>.</li>
+          <li>Reject unverified domains with a readable 401 or 403 response.</li>
+          <li>Never require backend secret keys in browser SDK usage.</li>
+        </ul>
+      </section>
+
+      <!-- ===== Testing ===== -->
+      <section id="testing">
+        <h2>Testing checklist</h2>
+        <p>Manual verification before publishing or going live with a new merchant origin.</p>
+        <ol>
+          <li>Run <code>npm run build</code> and confirm the bundle output exists in <code>dist/</code>.</li>
+          <li>Load the SDK from the main eTalase app; confirm requests include <code>x-etalase-store-key</code>.</li>
+          <li>Load from the builder preview after allowlisting that preview origin.</li>
+          <li>Load from <code>http://localhost:5173</code> (or your dev port) after allowlisting the exact origin.</li>
+          <li>Load from the merchant's approved custom domain; confirm requests succeed.</li>
+          <li>Load from an unverified domain; confirm the SDK surfaces the unauthorized-domain message.</li>
+        </ol>
+        <p>Detailed notes live in <a href="./manual-testing.md">manual-testing.md</a>.</p>
+      </section>
+
+      <!-- ===== AI Guide ===== -->
+      <section id="ai-guide">
+        <h2>For AI agents</h2>
+        <p>
+          If an AI assistant integrates, modifies, or reasons about this SDK, the canonical
+          contract document is <a href="./ai-agent.md">ai-agent.md</a>. It defines the
+          initialization contract, request shape, security model, and what AI agents must
+          <em>not</em> change.
+        </p>
+
+        <div class="callout info">
+          <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div class="callout-body">
+            <div class="callout-title">Key invariants</div>
+            <ul style="margin: 6px 0 0;">
+              <li>Public initialization field is <code>storeKey</code> — never reintroduce <code>storeId</code>.</li>
+              <li>All backend calls must go through <code>EtalaseApiClient</code>.</li>
+              <li>Do not introduce React as a dependency unless the package intentionally becomes a React SDK.</li>
+              <li>Do not use wildcard CORS, manual <code>Origin</code>, or <code>mode: "no-cors"</code>.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== FAQ ===== -->
+      <section id="faq">
+        <h2>FAQ</h2>
+
+        <h3>Can I use this on the server (SSR)?</h3>
+        <p>
+          Yes for read-only calls. Server runtimes must provide <code>fetch</code> (Node 18+,
+          modern edge runtimes). Set <code>persist: false</code> — there's no
+          <code>localStorage</code> on the server. For SSR carts, keep cart state on the client.
+        </p>
+
+        <h3>Does the SDK ship React components?</h3>
+        <p>
+          No. It exports classes, factories, and TypeScript types. <code>ETalaseProvider</code>
+          is a plain class wrapper, not a JSX provider.
+        </p>
+
+        <h3>Where do I get a public store key?</h3>
+        <p>From your eTalase merchant dashboard. Keys are scoped per store and prefixed <code>store_public_</code>.</p>
+
+        <h3>Why does my localhost request fail?</h3>
+        <p>
+          The exact origin — protocol, host, and port — must be added to the store's allowed
+          origins in the dashboard. <code>http://localhost:5173</code> and
+          <code>http://localhost:3000</code> are different origins to the backend.
+        </p>
+
+        <h3>How do I clear the persisted cart?</h3>
+        <p>Call <code>etalase.cart.clear()</code>. The persisted entry under <code>etalase-cart-&lt;storeKey&gt;</code> is rewritten immediately.</p>
+      </section>
+
+    </main>
+
+    <!-- =========================
+         Table of contents
+         ========================= -->
+    <aside class="toc" id="toc">
+      <div class="toc-title">On this page</div>
+      <ul class="toc-list" id="tocList"></ul>
+    </aside>
+
+    <!-- =========================
+         Footer
+         ========================= -->
+    <footer class="footer">
+      <div>eTalase SDK · v1.0 · MIT License</div>
+      <div>
+        Built for the <a href="https://github.com/reshadirgabiz-del/jastip-live" rel="noopener" target="_blank">eTalase</a> storefront platform · See also
+        <a href="./ai-agent.md">ai-agent.md</a> and
+        <a href="./manual-testing.md">manual-testing.md</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================================
+       Behavior
+       ======================================================== -->
+  <script>
+    (function () {
+      // -----------------------------------------------------
+      // Theme toggle (persisted)
+      // -----------------------------------------------------
+      const root = document.documentElement;
+      const stored = localStorage.getItem('etalase-docs-theme');
+      if (stored) root.setAttribute('data-theme', stored);
+      document.getElementById('themeToggle').addEventListener('click', function () {
+        const current = root.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('etalase-docs-theme', next);
+      });
+
+      // -----------------------------------------------------
+      // Mobile nav toggle
+      // -----------------------------------------------------
+      const toggle = document.getElementById('navToggle');
+      toggle?.addEventListener('click', function () {
+        document.body.classList.toggle('nav-open');
+      });
+      document.querySelectorAll('.sidebar .nav-link').forEach(function (a) {
+        a.addEventListener('click', function () {
+          document.body.classList.remove('nav-open');
+        });
+      });
+
+      // -----------------------------------------------------
+      // Tabs
+      // -----------------------------------------------------
+      document.querySelectorAll('[data-tabs]').forEach(function (tabsRoot) {
+        tabsRoot.querySelectorAll('.tab-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const target = btn.dataset.tab;
+            tabsRoot.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+            tabsRoot.querySelectorAll('.tabpanel').forEach(function (p) {
+              p.classList.toggle('is-active', p.dataset.panel === target);
+            });
+          });
+        });
+      });
+
+      // -----------------------------------------------------
+      // Copy buttons (preserves formatting, strips tokens)
+      // -----------------------------------------------------
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const block = btn.closest('.code-block');
+          if (!block) return;
+          const code = block.querySelector('pre code');
+          if (!code) return;
+          const text = code.innerText;
+          navigator.clipboard.writeText(text).then(function () {
+            const originalText = btn.textContent;
+            btn.classList.add('is-copied');
+            btn.textContent = 'Copied';
+            setTimeout(function () {
+              btn.classList.remove('is-copied');
+              btn.textContent = originalText;
+            }, 1400);
+          });
+        });
+      });
+
+      // -----------------------------------------------------
+      // Active section highlight (sidebar + TOC)
+      // -----------------------------------------------------
+      const sections = Array.from(document.querySelectorAll('.content > section[id]'));
+      const sidebarLinks = Array.from(document.querySelectorAll('.sidebar .nav-link'));
+
+      function activateById(id) {
+        sidebarLinks.forEach(function (l) {
+          l.classList.toggle('is-active', l.getAttribute('href') === '#' + id);
+        });
+        document.querySelectorAll('#tocList a').forEach(function (l) {
+          l.classList.toggle('is-active', l.getAttribute('href') === '#' + id);
+        });
+      }
+
+      const io = new IntersectionObserver(function (entries) {
+        const visible = entries
+          .filter(function (e) { return e.isIntersecting; })
+          .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+        if (visible[0]) activateById(visible[0].target.id);
+      }, { rootMargin: '-100px 0px -65% 0px', threshold: 0 });
+      sections.forEach(function (s) { io.observe(s); });
+
+      // -----------------------------------------------------
+      // Build right-side TOC from the focused section's headings
+      // -----------------------------------------------------
+      const tocList = document.getElementById('tocList');
+      function buildTocFor(id) {
+        const section = document.getElementById(id);
+        if (!section || !tocList) return;
+        const headings = section.querySelectorAll('h2, h3');
+        tocList.innerHTML = '';
+        headings.forEach(function (h) {
+          if (!h.id) h.id = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.className = 'indent-2';
+          li.appendChild(a);
+          tocList.appendChild(li);
+        });
+      }
+      buildTocFor(sections[0].id);
+      const tocObserver = new IntersectionObserver(function (entries) {
+        const visible = entries
+          .filter(function (e) { return e.isIntersecting; })
+          .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+        if (visible[0]) buildTocFor(visible[0].target.id);
+      }, { rootMargin: '-100px 0px -65% 0px', threshold: 0 });
+      sections.forEach(function (s) { tocObserver.observe(s); });
+
+      // -----------------------------------------------------
+      // Lightweight client-side search (jumps to first match)
+      // -----------------------------------------------------
+      const search = document.getElementById('docSearch');
+      function focusSearch(e) {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          search?.focus();
+        }
+      }
+      window.addEventListener('keydown', focusSearch);
+
+      search?.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        const q = search.value.trim().toLowerCase();
+        if (!q) return;
+        for (const section of sections) {
+          if (section.textContent.toLowerCase().indexOf(q) !== -1) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.replaceState(null, '', '#' + section.id);
+            break;
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

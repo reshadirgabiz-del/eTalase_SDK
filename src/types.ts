@@ -35,6 +35,12 @@ export interface Product {
   updatedAt: string;
 }
 
+export interface ProductPhotoSummary {
+  productId: string;
+  productName: string;
+  photos: ProductImage[];
+}
+
 export interface CartItem {
   product: Product;
   variant?: ProductVariant;
@@ -113,7 +119,7 @@ export interface Order {
 }
 
 export interface CheckoutPayload {
-  storeId: string;
+  storeId?: string;
   items: { productId: string; variantId?: string; quantity: number }[];
   address: Address;
   deliveryOption: DeliveryOption;
@@ -143,6 +149,11 @@ export interface PublicSettings {
 export interface PublicStoreInfo {
   storeName: string;
   storePhotoUrl?: string;
+}
+
+export interface StoreInformation {
+  info: PublicStoreInfo | null;
+  settings: PublicSettings | null;
 }
 
 export interface PaginatedResponse<T> {

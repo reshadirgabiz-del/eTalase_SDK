@@ -1,12 +1,12 @@
-import { request } from '../http';
+import type { EtalaseApiClient } from './client';
 import type { DeliveryOption, DeliveryEstimatePayload } from '../types';
 
-export function createDeliveryApi(baseUrl: string, storeId: string) {
+export function createDeliveryApi(apiClient: EtalaseApiClient, storeKey: string) {
   return {
     estimate: (payload: DeliveryEstimatePayload) =>
-      request<DeliveryOption[]>(baseUrl, '/delivery/estimate', {
+      apiClient.request<DeliveryOption[]>('/delivery/estimate', {
         method: 'POST',
-        body: JSON.stringify({ storeId, ...payload }),
+        body: JSON.stringify({ storeId: storeKey, ...payload }),
       }),
   };
 }

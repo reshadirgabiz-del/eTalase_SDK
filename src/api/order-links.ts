@@ -1,9 +1,9 @@
-import { request } from '../http';
+import type { EtalaseApiClient } from './client';
 import type { OrderLinkPublic } from '../types';
 
-export function createOrderLinksApi(baseUrl: string) {
+export function createOrderLinksApi(apiClient: EtalaseApiClient) {
   return {
     getPublic: (linkId: string) =>
-      request<OrderLinkPublic>(baseUrl, `/order-links/${linkId}/public`),
+      apiClient.request<OrderLinkPublic>(`/order-links/${linkId}/public`),
   };
 }

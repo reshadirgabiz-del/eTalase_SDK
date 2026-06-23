@@ -1,12 +1,12 @@
-import { request } from '../http';
+import type { EtalaseApiClient } from './client';
 import type { PromoValidationResult, PromoValidatePayload } from '../types';
 
-export function createPromoApi(baseUrl: string, storeId: string) {
+export function createPromoApi(apiClient: EtalaseApiClient, storeKey: string) {
   return {
     validate: (payload: PromoValidatePayload) =>
-      request<PromoValidationResult>(baseUrl, '/promo-codes/validate', {
+      apiClient.request<PromoValidationResult>('/promo-codes/validate', {
         method: 'POST',
-        body: JSON.stringify({ storeId, ...payload }),
+        body: JSON.stringify({ storeId: storeKey, ...payload }),
       }),
   };
 }
