@@ -10,11 +10,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    },
-    "./shopee": {
-      "types": "./dist/shopee/index.d.ts",
-      "import": "./dist/shopee/index.mjs",
-      "require": "./dist/shopee/index.js"
     }
   },
   "files": [
