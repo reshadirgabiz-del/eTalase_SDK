@@ -139,12 +139,15 @@ function toProductPhotoSummary(product: Product): ProductPhotoSummary {
   };
 }
 
-export function createProductsApi(apiClient: EtalaseApiClient, storeKey: string) {
+export function createProductsApi(apiClient: EtalaseApiClient, _storeKey: string) {
   const list = async (params?: { page?: number; limit?: number }) => {
-    const qs = new URLSearchParams({ storeId: storeKey });
+    const qs = new URLSearchParams();
     if (params?.page) qs.set('page', String(params.page));
     if (params?.limit) qs.set('limit', String(params.limit));
-    const res = await apiClient.request<Record<string, unknown>>(`/products?${qs}`);
+    const query = qs.toString();
+    const res = await apiClient.request<Record<string, unknown>>(
+      query ? `/products?${query}` : '/products',
+    );
     return normalizePaginated(res);
   };
 

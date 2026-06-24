@@ -1,12 +1,12 @@
 import type { EtalaseApiClient } from './client';
 import type { Order, CheckoutPayload, PublicOrderTracking } from '../types';
 
-export function createOrdersApi(apiClient: EtalaseApiClient, storeKey: string) {
+export function createOrdersApi(apiClient: EtalaseApiClient, _storeKey: string) {
   return {
     create: (payload: CheckoutPayload) =>
       apiClient.request<Order>('/orders', {
         method: 'POST',
-        body: JSON.stringify({ ...payload, storeId: payload.storeId ?? storeKey }),
+        body: JSON.stringify(payload),
       }),
 
     track: (orderId: string, phone: string) => {

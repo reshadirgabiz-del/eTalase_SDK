@@ -71,14 +71,14 @@ function normalizeSettings(raw: RawRecord | null): PublicSettings | null {
   };
 }
 
-export function createStoreApi(apiClient: EtalaseApiClient, storeKey: string) {
+export function createStoreApi(apiClient: EtalaseApiClient, _storeKey: string) {
   const getInfo = async (): Promise<PublicStoreInfo | null> => {
-    const raw = await apiClient.request<RawRecord | null>(`/stores/${storeKey}/public`);
+    const raw = await apiClient.request<RawRecord | null>('/stores/public');
     return normalizeStoreInfo(raw);
   };
 
   const getSettings = async (): Promise<PublicSettings | null> => {
-    const raw = await apiClient.request<RawRecord | null>(`/settings/public?storeId=${storeKey}`);
+    const raw = await apiClient.request<RawRecord | null>('/settings/public');
     return normalizeSettings(raw);
   };
 
